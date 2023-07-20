@@ -4,12 +4,17 @@ var THREE = window.THREE;
 var scene = new THREE.Scene();
 
 // Get the container
-var container = document.getElementById('home-banner');
+var container = document.getElementById("home-banner");
 var containerWidth = container.offsetWidth;
 var containerHeight = container.offsetHeight;
 
 // Create a camera
-var camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(
+  75,
+  containerWidth / containerHeight,
+  0.1,
+  1000
+);
 camera.position.z = 5;
 
 // Create a renderer
@@ -153,110 +158,138 @@ var fragmentShader = `
 `;
 
 var material = new THREE.ShaderMaterial({
-uniforms: {
+  uniforms: {
     uTexture: { value: texture },
     time: { value: 0 },
     mouse: { value: new THREE.Vector2(0, 0) },
-    scrolling: { value: false } // new uniform
-},
-vertexShader,
-fragmentShader,
-    wireframe: false
+    scrolling: { value: false }, // new uniform
+  },
+  vertexShader,
+  fragmentShader,
+  wireframe: false,
 });
 
 // Convert window size to Three.js units
 var aspectRatio = containerWidth / containerHeight;
 var frustumSize = 20; // This can be any number, but it will affect the size of your objects
-camera.left = frustumSize * aspectRatio / -2;
-camera.right = frustumSize * aspectRatio / 2;
+camera.left = (frustumSize * aspectRatio) / -2;
+camera.right = (frustumSize * aspectRatio) / 2;
 camera.top = frustumSize / 2;
 camera.bottom = frustumSize / -2;
 camera.updateProjectionMatrix();
 
-var gradient = new THREE.Mesh(new THREE.PlaneGeometry(camera.right - camera.left, camera.top - camera.bottom), material);
+var gradient = new THREE.Mesh(
+  new THREE.PlaneGeometry(
+    camera.right - camera.left,
+    camera.top - camera.bottom
+  ),
+  material
+);
 gradient.material.depthTest = false;
 gradient.material.depthWrite = false;
 gradient.renderOrder = -1;
 scene.add(gradient);
 
 // Add window resize listener
-window.addEventListener('resize', onWindowResize, false);
+window.addEventListener("resize", onWindowResize, false);
 
 function onWindowResize() {
-    containerWidth = container.offsetWidth;
-    containerHeight = container.offsetHeight;
-    renderer.setSize(containerWidth, containerHeight);
-    camera.aspect = containerWidth / containerHeight;
-    camera.updateProjectionMatrix();
+  containerWidth = container.offsetWidth;
+  containerHeight = container.offsetHeight;
+  renderer.setSize(containerWidth, containerHeight);
+  camera.aspect = containerWidth / containerHeight;
+  camera.updateProjectionMatrix();
 
-    // Remove the old gradient
-    scene.remove(gradient);
+  // Remove the old gradient
+  scene.remove(gradient);
 
-    // Recreate the gradient
-// Recreate the gradient
-textureLoader.load(pageHeroData.imageUrl, function(texture) {
+  // Recreate the gradient
+  // Recreate the gradient
+  textureLoader.load(pageHeroData.imageUrl, function (texture) {
     material.uniforms.uTexture.value = texture;
-    gradient = new THREE.Mesh(new THREE.PlaneGeometry(camera.right - camera.left, camera.top - camera.bottom), material);
+    gradient = new THREE.Mesh(
+      new THREE.PlaneGeometry(
+        camera.right - camera.left,
+        camera.top - camera.bottom
+      ),
+      material
+    );
     gradient.material.depthTest = false;
     gradient.material.depthWrite = false;
     gradient.renderOrder = -1;
     scene.add(gradient);
-});
-
+  });
 }
 
 // Render the scene
 function animate() {
-    requestAnimationFrame(animate);
-    material.uniforms.time.value += 0.01;
-    renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+  material.uniforms.time.value += 0.01;
+  renderer.render(scene, camera);
 }
 
 function debounce(func, wait, immediate) {
-    var timeout;
-    return function() {
-        var context = this, args = arguments;
-        var later = function() {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
+  var timeout;
+  return function () {
+    var context = this,
+      args = arguments;
+    var later = function () {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
     };
-};
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
 
-window.addEventListener('mousemove', function(e) {
-    material.uniforms.mouse.value.x = e.clientX / window.innerWidth;
-    material.uniforms.mouse.value.y = 1 - e.clientY / window.innerHeight;
+window.addEventListener("mousemove", function (e) {
+  material.uniforms.mouse.value.x = e.clientX / window.innerWidth;
+  material.uniforms.mouse.value.y = 1 - e.clientY / window.innerHeight;
 });
 
 var isScrolling = false;
 
-window.addEventListener('touchstart', function(e) {
+window.addEventListener(
+  "touchstart",
+  function (e) {
     isScrolling = false;
-}, false);
+  },
+  false
+);
 
-window.addEventListener('touchmove', function(e) {
+window.addEventListener(
+  "touchmove",
+  function (e) {
     if (isScrolling) return;
     if (e.touches.length > 0) {
-        var touch = e.touches[0];
-        material.uniforms.mouse.value.x = touch.clientX / window.innerWidth;
-        material.uniforms.mouse.value.y = 1 - touch.clientY / window.innerHeight;
+      var touch = e.touches[0];
+      material.uniforms.mouse.value.x = touch.clientX / window.innerWidth;
+      material.uniforms.mouse.value.y = 1 - touch.clientY / window.innerHeight;
     }
-}, false);
+  },
+  false
+);
 
-window.addEventListener('scroll', function(e) {
+window.addEventListener(
+  "scroll",
+  function (e) {
     isScrolling = true;
     material.uniforms.scrolling.value = true;
-}, false);
+  },
+  false
+);
 
-window.addEventListener('touchend', function(e) {
+window.addEventListener(
+  "touchend",
+  function (e) {
     isScrolling = false;
     material.uniforms.scrolling.value = false;
-}, false);
+  },
+  false
+);
 
-window.addEventListener('resize', debounce(onWindowResize, 150), false);
+window.addEventListener("resize", debounce(onWindowResize, 150), false);
 
 animate();
