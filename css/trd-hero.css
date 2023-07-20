@@ -1,0 +1,21 @@
+#hero {
+    width: 100vw;
+    position: relative;
+}
+
+.hero-container {
+    position: absolute;
+    top: 60%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    text-align: left;
+    width: 100%;
+}
+
+.hero-title {
+    color: white;
+}
+
+.hero-subtitle {
+    color: white;
+}
